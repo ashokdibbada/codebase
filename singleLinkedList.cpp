@@ -1,119 +1,141 @@
-#include <iostream>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string>
+#include <stdio.h>
+#include <iostream>
 
 using namespace std;
 
-struct node{
+struct node {
     int data;
-    struct node* ptr;
+    struct node* next;
 };
 
-
+void printList(struct node* pp);
+int ListLength(struct node* lp);
 struct node* createNode(int data);
-void appendValues(struct node** dp,int data);
-void printValues(struct node* pp);
-void popValues(struct node** dp);
-void deleteValues(struct node** dp, int pos);
-void insertValues(struct node** dp, int pos,int data);
+void appendNode(struct node** dp,int data);
+void insertNode(struct node** dp,int data,int pos);
+void delValues(struct node** dp,int pos);
 
 int main(){
     struct node* head = NULL;
-    int data;
-    cin>>data;
-    appendValues(&head,data);
-    cin>>data;
-    appendValues(&head,data);
-    cin>>data;
-    appendValues(&head,data);
-    cin>>data;
-    appendValues(&head,data);
-    cin>>data;
-    appendValues(&head,data);
-    cin>>data;
-    appendValues(&head,data);
-    popValues(&head);
-    deleteValues(&head,4);
-    insertValues(&head,0,5);
-    printValues(head);
+    int number,pos,i=0;
+    while(i != 5){
+    cout<<"Enter code for following operations: \n 1:Create or Append \n 2:Print List \n 3:Insert \n 4:Delete \n 5:Exit \n"<<endl;
+    cout<<"Enter choice: ";
+    cin>>i;
+    if(i==1){
+        cout<<"Enter Data element:  ";
+        cin>>number;
+        appendNode(&head,number);
+    }
+    if(i==2){
+        printList(head);
+    }
+    if(i==3){
+        int length = ListLength(head);
+        cout<<"Linked List Length is: ";
+        cout<<length<<endl;
+        cout<<"Enter number between 0 and Length: ";
+        cin>>pos;
+        cout<<"Enter Data element: ";
+        cin>>number;
+        insertNode(&head,number,pos);
+    }
+    if(i==4){
+        int length = ListLength(head);
+        cout<<"Linked List Length is: ";
+        cout<<length<<endl;
+        cout<<"Enter number between 0 and Length: ";
+        cin>>pos;
+        delValues(&head,pos);
+    }
+    }
     return 0;
 }
 
-struct node* createNode(int data){
-    struct node* temp = new node;
-    temp->data = data;
-    temp->ptr = NULL;
-    return temp;
+void printList(struct node* pp){
+    cout<<"-------------"<<endl;
+    cout<<"The Elements are: "<<endl;
+    while(pp != NULL){
+        cout<<pp->data<<endl;
+        pp = pp->next;
+    }
+    cout<<"-------------"<<endl;
 };
 
-void appendValues(struct node** dp,int data){
+struct node* createNode(int data){
+    struct node* new_node = new node;
+    new_node->data = data;
+    new_node->next = NULL;
+    return new_node;
+};
+
+void appendNode(struct node** dp,int data){
     if(*dp == NULL){
-        *dp = createNode(data);
+        * dp = createNode(data);
     }
     else{
-        struct node* last = *dp;
-        while(last->ptr != NULL){
-            last = last->ptr;
+        struct node* iter = *dp;
+        while(iter->next != NULL){
+            iter = iter->next;
         }
-        last->ptr = createNode(data);
+        iter->next = createNode(data);
     }
-}
+};
 
-void printValues(struct node* pp){
-    cout<<"List:"<<endl;
-    while(pp !=NULL){
-    cout<<pp->data<<endl;
-    pp = pp->ptr;
+int ListLength(struct node* lp){
+    int length = 0;
+    while(lp != NULL){
+        lp = lp->next;
+        length++;
     }
-}
+    return length;
+};
 
-void popValues(struct node** dp){
-    if(*dp == NULL){
-        cout<<"Empty"<<endl;
-    }
-    else{
-        struct node* del = *dp;
-        struct node* slast = NULL;
-        while(del->ptr != NULL){
-            slast = del;
-            del = del->ptr;
-        }
-        slast->ptr = NULL;
-    }
-}
-
-void deleteValues(struct node** dp, int pos){
-    struct node* del = *dp;
-    struct node* iter = NULL;
-    if(pos==0){ // base case
-        del = del->ptr;
-        *dp = del;
-    }
-    else{
-        for(int i=0;i<pos;i++){
-            iter = del;
-            del = del->ptr;
-        }
-        iter->ptr = del->ptr;
-        free(del);
-    }
-}
-
-void insertValues(struct node** dp,int pos,int data){
+void insertNode(struct node** dp,int data,int pos){
+    int length = ListLength(*dp);
     struct node* new_node = createNode(data);
-    if(pos==0){
-        new_node->ptr = *dp;
-        *dp = new_node;
+    if(pos == 0){
+        new_node->next = *dp;
+        * dp = new_node;
     }
     else{
-        struct node* ip = *dp;
-        struct node* iter = NULL;
-        for(int i=0;i<pos;i++){
-                iter = ip;
-                ip = ip->ptr;
+        if(pos<=length){
+            struct node* iter = *dp;
+            struct node* prev = NULL;
+            for(int i=0;i<pos;i++){
+                prev = iter;
+                iter = iter->next;
+            }
+            prev->next = new_node;
+            new_node->next = iter;
         }
-        new_node->ptr = ip;
-        iter->ptr = new_node;
     }
-}
+};
+
+
+void delValues(struct node** dp,int pos){
+    if(*dp == NULL){
+        cout<<"Empty List"<<endl;
+    }
+    else{
+        int length = ListLength(*dp);
+        struct node* del = *dp;
+        struct node* temp = NULL;
+        if(pos<length){
+        if(pos==0){
+            del = del->next;
+            *dp = del;
+        }
+        else{
+            for(int i=0;i<pos;i++){
+                temp = del;
+                del = del->next;
+            }
+            temp->next = del->next;
+            del->next = NULL;
+            free(del);
+        }
+        }
+    }
+};
