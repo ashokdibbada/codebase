@@ -1,20 +1,24 @@
 #include <iostream>
 #include <stdlib.h>
 #include <new>
+#include <math.h>
 /*** C++ arrays and pointers can be used vice versa ****/
 using namespace std;
 
 void insertionSort(int* ptr, int number);
 void bubbleSort(int* ptr, int number);
 void selectionSort(int* ptr, int number);
-void mergeSort(int* ptr,int low,int high);
-void mergeBoth(int* ptr,int low,int mid,int high);
-int pivotIndexGen(int* ptr,int low,int high);
-void quickSort(int* ptr,int low,int high);
+void mergeSort(int* ptr, int low, int high);
+void mergeBoth(int* ptr, int low, int mid,int high);
+int Partition(int* ptr,int low,int high);
+void quickSort(int* ptr, int low,int high);
 
-int number;
+
+// Search Algorithms
+void binarySearch(int* ptr,int low,int high,int element);
+
 int main(){
-
+    int number,method,element;
     int* ptr;
     cout<<"Enter No. of Numbers: ";
     cin>>number;
@@ -22,14 +26,34 @@ int main(){
     for(int i=0;i<number;i++){
         cin>>arr[i];
     }
-    quickSort(arr,0,number-1);
-//    mergeSort(arr,0,number-1);
-//    selectionSort(arr,number);
-//   bubbleSort(arr,number);
-//    insertionSort(arr,number);
+    cout<<"Enter Sorting Method: \n 1: Insertion Sort \n 2: BubbleSort \n 3: SelectionSort \n 4: MergeSort \n 5: QuickSort \n"<<endl;
+    cin>>method;
+    if(method == 1){
+        cout<<"Sorting using InsertionSort:"<<endl;
+        insertionSort(arr,number);
+    }
+    if (method == 2){
+    cout<<"Sorting using BubbleSort:"<<endl;
+        bubbleSort(arr,number);
+    }
+    if (method == 3){
+         cout<<"Sorting using SelectionSort:"<<endl;
+        selectionSort(arr,number);
+    }
+    if(method == 4){
+        cout<<"Sorting using MergeSort:"<<endl;
+        mergeSort(arr,0,number-1);
+    }
+    if(method == 5){
+        cout<<"Sorting using QuickSort:"<<endl;
+        quickSort(arr,0,number-1);
+    }
     for(int element:arr){
         cout<<element<<endl;
     }
+    cout<<"Enter an element to search: ";
+    cin>>element;
+    binarySearch(arr,0,number,element);
     return 0;
 }
 
@@ -90,66 +114,81 @@ void mergeSort(int* ptr,int low,int high){
 }
 
 void mergeBoth(int* ptr,int low,int mid,int high){
-    int n1 = (mid-low) +1;
-    int n2 = (high-mid);
-    int left[n1];
-    int right[n2];
+    int n1 = mid-low+1;
+    int n2 = high-mid;
+    int L[n1] ,R[n2];
     for(int i=0;i<n1;i++){
-        left[i] = ptr[low+i];
+        L[i] = *(ptr+low+i);
     }
     for(int i=0;i<n2;i++){
-        right[i] = ptr[mid+1+i];
+        R[i] = *(ptr+mid+1+i);
     }
     int i=0,j=0,k=low;
-    while(i<n1 && j< n2){
-        if(left[i] < right[j]){
-            ptr[k] = left[i];
-            k++;
+    while(i < n1 && j < n2){
+        if(L[i] < R[j]){
+            *(ptr+k) = L[i];
             i++;
         }
         else{
-            ptr[k] = right[j];
-            k++;
+            *(ptr+k) = R[j];
             j++;
         }
+        k++;
     }
     while(i<n1){
-        ptr[k] = left[i];
+        *(ptr+k) = L[i];
         i++;
         k++;
     }
-    while(j <n2){
-        ptr[k] = right[j];
+    while(j<n2){
+        *(ptr+k) = R[j];
         j++;
         k++;
     }
 }
 
 void quickSort(int* ptr,int low,int high){
+    int pIndex =0;
     if(high>low){
-        int pIndex = pivotIndexGen(ptr,low,high);
+        pIndex = Partition(ptr,low,high);
         quickSort(ptr,low,pIndex-1);
         quickSort(ptr,pIndex+1,high);
     }
 }
 
-int pivotIndexGen(int* ptr,int low,int high){
-    int pivot = ptr[high];
-    int i = low;
-    int j = high -1;
-    while(j >= i){
-        if(pivot > ptr[j]){
-            int swapper = ptr[j];
-            ptr[j] = ptr[i];
-            ptr[i] = swapper;
-            i++;
-        }
-        else{
-        j--;
+int Partition(int* ptr,int low,int high){
+    int pilot = *(ptr+high);
+    int pIndex = low;
+    for(int i=low;i<high;i++){
+        if(*(ptr+i) < pilot){
+            int swapper = *(ptr+pIndex);
+            *(ptr+i) = swapper;
+            *(ptr+pIndex) = *(ptr+i);
+            pIndex ++;
         }
     }
-    ptr[high] = ptr[i];
-    ptr[i] = pivot;
-    return i;
+    int swapper = *(ptr+pIndex);
+    *(ptr+pIndex) = ptr[high];
+    *(ptr+high) = swapper;
+    return pIndex;
 }
 
+void binarySearch(int* ptr,int low,int high,int element){
+    if(high > low){
+        int mid = (low+high-1)/2;
+        if(ptr[mid] == element){
+            cout<<"Element found at :";
+            cout<<mid;
+            return;
+        }
+        else if(ptr[mid] < element){
+            binarySearch(ptr,mid+1,high,element);
+        }
+        else{
+            binarySearch(ptr,0,mid-1,element);
+        }
+    }
+    else{
+        cout<<"Not found";
+    }
+};
